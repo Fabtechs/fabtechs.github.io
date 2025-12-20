@@ -6,12 +6,11 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
+    "generate:gh": "node ./scripts/github-pages-build.mjs",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "^3.17.4",
-    "vue": "^3.5.14",
-    "vue-router": "^4.5.1"
+    "nuxt": "^4.2.2"
   }
 }
