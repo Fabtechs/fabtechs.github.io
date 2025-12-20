@@ -8,24 +8,18 @@ defineProps<{ logos: string[] }>();
       <div class="section-heading">
         <span>Clients</span>
         <h2>
-          Trusted by industrial leaders across Ankleshwar, Panoli, Jhagadia, and
-          Dahej.
+          Trusted by industrial leaders across South Gujarat
         </h2>
       </div>
-      <div class="partner-marquee">
-        <div class="partner-track">
-          <template
-            v-for="(logo, index) in [...logos, ...logos]"
-            :key="`${logo}-${index}`"
-          >
-            <img
-              :src="logo"
-              alt="Partner logo"
-              class="partner-logo"
-              loading="lazy"
-            />
-          </template>
-        </div>
+      <div class="partner-grid">
+        <img
+          v-for="logo in logos"
+          :key="logo"
+          :src="logo"
+          alt="Partner logo"
+          class="partner-logo"
+          loading="lazy"
+        />
       </div>
     </div>
   </section>
