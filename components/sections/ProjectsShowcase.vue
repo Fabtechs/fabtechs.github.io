@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from "vue";
 import type { ProjectItem } from "~/data/siteContent";
 
 type Props = {
@@ -8,11 +9,53 @@ type Props = {
   cta?: { label: string; to: string };
 };
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   title: undefined,
   description: undefined,
   cta: undefined,
 });
+
+const selectedIndex = ref<number | null>(null);
+
+const currentImage = computed(() => {
+  return selectedIndex.value !== null ? props.items[selectedIndex.value].image : null;
+});
+
+const openLightbox = (image: string) => {
+  selectedIndex.value = props.items.findIndex(item => item.image === image);
+};
+
+const closeLightbox = () => {
+  selectedIndex.value = null;
+};
+
+const nextImage = () => {
+  if (selectedIndex.value !== null) {
+    selectedIndex.value = (selectedIndex.value + 1) % props.items.length;
+  }
+};
+
+const prevImage = () => {
+  if (selectedIndex.value !== null) {
+    selectedIndex.value = (selectedIndex.value - 1 + props.items.length) % props.items.length;
+  }
+};
+
+const handleOverlayClick = (event: MouseEvent) => {
+  if (event.target === event.currentTarget) {
+    closeLightbox();
+  }
+};
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+    closeLightbox();
+  } else if (event.key === "ArrowRight") {
+    nextImage();
+  } else if (event.key === "ArrowLeft") {
+    prevImage();
+  }
+};
 </script>
 
 <template>
@@ -52,14 +95,56 @@ withDefaults(defineProps<Props>(), {
           class="project-card"
         >
           <figure>
-            <img :src="project.image" :alt="project.title" loading="lazy" />
-            <figcaption>
-              <h3>{{ project.title }}</h3>
-              <p>{{ project.location }}</p>
-            </figcaption>
+            <img
+              :src="project.image"
+              :alt="project.title"
+              loading="lazy"
+              class="project-image"
+              @click="openLightbox(project.image)"
+            />
           </figure>
         </article>
       </div>
+
+      <!-- Lightbox Modal -->
+      <Teleport to="body">
+        <div
+          v-if="selectedIndex !== null"
+          class="lightbox-overlay"
+          @click="handleOverlayClick"
+          @keydown="handleKeydown"
+          tabindex="0"
+          autofocus
+        >
+          <button
+            class="lightbox-close"
+            aria-label="Close lightbox"
+            @click="closeLightbox"
+          >
+            ✕
+          </button>
+          <button
+            class="lightbox-nav lightbox-prev"
+            aria-label="Previous image"
+            @click="prevImage"
+          >
+            ‹
+          </button>
+          <div class="lightbox-container" @click.stop>
+            <img :src="currentImage" :alt="'Project detail'" class="lightbox-image" />
+          </div>
+          <button
+            class="lightbox-nav lightbox-next"
+            aria-label="Next image"
+            @click="nextImage"
+          >
+            ›
+          </button>
+          <div class="lightbox-counter">
+            {{ (selectedIndex ?? 0) + 1 }} / {{ items.length }}
+          </div>
+        </div>
+      </Teleport>
     </div>
   </section>
 </template>
